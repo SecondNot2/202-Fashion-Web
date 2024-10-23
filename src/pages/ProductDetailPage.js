@@ -115,18 +115,6 @@ const ProductDetailPage = () => {
         alert("Chức năng chia sẻ sẽ được triển khai sau.");
     };
 
-    const handleZoom = () => {
-        setIsZoomed(!isZoomed);
-    };
-
-    const handleImageChange = (direction) => {
-        if (direction === "next") {
-            setCurrentImage((prev) => (prev + 1) % product.images.length);
-        } else {
-            setCurrentImage((prev) => (prev - 1 + product.images.length) % product.images.length);
-        }
-    };
-
     const handleFavorite = () => {
         setIsFavorite(!isFavorite);
         showNotification(isFavorite ? "Đã xóa khỏi danh sách yêu thích" : "Đã thêm vào danh sách yêu thích");
@@ -212,7 +200,7 @@ const ProductDetailPage = () => {
                         key={fullscreenImageIndex}
                         ref={imageRef}
                         src={fullscreenImage}
-                        alt="Fullscreen product image"
+                        alt={`${product.name} - Ảnh ${fullscreenImageIndex + 1}`}
                         className="max-w-full max-h-full object-contain"
                         style={{
                             x: dragX,
@@ -293,7 +281,7 @@ const ProductDetailPage = () => {
                             <motion.img
                                 key={activeIndex}
                                 src={product.images[activeIndex]}
-                                alt={`Sản phẩm ${activeIndex + 1}`}
+                                alt={`${product.name} - Ảnh ${activeIndex + 1}`}
                                 className="w-full h-[45rem] object-cover cursor-pointer"
                                 initial={{ opacity: 0.7 }}
                                 animate={{ opacity: 1 }}
@@ -329,7 +317,7 @@ const ProductDetailPage = () => {
                                     >
                                         <img
                                             src={image}
-                                            alt={`Ảnh nhỏ ${index + 1}`}
+                                            alt={`${product.name} - Thu nhỏ ${index + 1}`}
                                             className="w-full h-full object-cover rounded cursor-pointer transition-transform duration-300 hover:scale-105"
                                             onClick={() => setActiveIndex(index)}
                                         />
@@ -509,7 +497,7 @@ const ProductDetailPage = () => {
                                         <img
                                             key={index}
                                             src={image}
-                                            alt={`Review image ${index + 1}`}
+                                            alt={`Đánh giá ${index + 1} cho ${product.name}`}
                                             className="w-20 h-20 object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity duration-300"
                                             onClick={() => handleImageClick(image)}
                                         />
