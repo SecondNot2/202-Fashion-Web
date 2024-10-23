@@ -35,10 +35,10 @@ const Notification = ({ id, message, onClose, type = 'success', duration = 3000 
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 50 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, y: 50, scale: 0.3 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
                     onAnimationComplete={handleAnimationComplete}
                     className={`fixed bottom-4 right-4 ${getNotificationStyle()} text-white px-4 py-2 rounded-md shadow-lg z-50 border-l-4`}
                 >

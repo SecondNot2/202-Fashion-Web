@@ -12,15 +12,17 @@ const HomePage = () => {
     const { showNotification } = useNotification();
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
             <Banner />
+
+            {/* Loại bỏ container cho nội dung chính */}
             <FeaturedProducts showNotification={showNotification} />
             <SaleProducts showNotification={showNotification} />
             <RecommendedProducts showNotification={showNotification} />
             <SeasonalCollections />
             <FashionBlog />
             <CustomerReviews />
-        </>
+        </div>
     );
 };
 

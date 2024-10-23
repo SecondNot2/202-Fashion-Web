@@ -14,46 +14,44 @@ const SeasonalCollections = () => {
         <motion.section
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="container mx-auto px-4 py-16 bg-gray-50"
+            className="w-full bg-bg-secondary py-16"
         >
-            <h2 className="text-3xl font-bold text-center mb-12">Bộ sưu tập mùa</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {seasonalCollections.map((collection, index) => (
-                    <motion.div
-                        key={collection.id}
-                        className="bg-white rounded-lg shadow-md overflow-hidden"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                        whileHover={{ scale: 1.05 }}
-                    >
-                        <div className="h-64 overflow-hidden">
-                            <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <LazyImage
-                                    src={collection.image}
-                                    alt={collection.name}
-                                    className="w-full h-full object-cover"
-                                    wrapperClassName="w-full h-full"
-                                />
-                            </motion.div>
-                        </div>
-                        <div className="p-4">
-                            <h3 className="text-xl font-semibold mb-2">{collection.name}</h3>
-                            <p className="text-gray-600 mb-4">{collection.description}</p>
-                            <motion.button
-                                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
-                                Xem bộ sưu tập
-                            </motion.button>
-                        </div>
-                    </motion.div>
-                ))}
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <h2 className="text-3xl font-bold text-center mb-12 text-card-highlight">Bộ sưu tập theo mùa</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {seasonalCollections.map((collection, index) => (
+                        <motion.div
+                            key={collection.id}
+                            className="bg-card-bg rounded-lg shadow-md overflow-hidden"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.3 }}
+                            whileHover={{ scale: 1.05 }}
+                        >
+                            <div className="h-56 overflow-hidden">
+                                <motion.div>
+                                    <LazyImage
+                                        src={collection.image}
+                                        alt={collection.name}
+                                        className="w-full h-56 object-cover"
+                                        wrapperClassName="w-full h-full"
+                                    />
+                                </motion.div>
+                            </div>
+                            <div className="p-4">
+                                <h3 className="text-xl font-semibold mb-2 text-card-headline">{collection.name}</h3>
+                                <p className="text-card-paragraph mb-4 line-clamp-2">{collection.description}</p>
+                                <motion.button
+                                    className="w-full bg-btn-primary text-btn-text py-2 rounded-md hover:bg-blue-700 transition duration-300"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Xem bộ sưu tập
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
             </div>
         </motion.section>
     );

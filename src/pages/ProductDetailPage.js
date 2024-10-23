@@ -1,12 +1,16 @@
-import React, { useState } from "react";
-import { FaShare, FaStar, FaChevronLeft, FaChevronRight, FaHeart, FaThumbsUp, FaComment, FaHome } from "react-icons/fa";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { FaShare, FaStar, FaChevronLeft, FaChevronRight, FaHeart, FaThumbsUp, FaComment, FaHome, FaChevronRight as FaChevronRightSmall, FaMinus, FaPlus } from "react-icons/fa";
 import { MdZoomIn, MdClose } from "react-icons/md";
 import { useNotification } from '../contexts/NotificationContext';
-import AddToCartButton from '../components/atoms/AddToCartButton/AddToCartButton';
-import { motion } from "framer-motion";
+import { useCart } from '../contexts/CartContext';
+import AddToCartButton from '../components/atoms/AddToCartButton';
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { useAnimation } from "framer-motion";
 import { Link } from "react-router-dom";
+
 const ProductDetailPage = () => {
     const { showNotification } = useNotification();
+    const { addToCart } = useCart();
     const [currentImage, setCurrentImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
@@ -15,6 +19,18 @@ const ProductDetailPage = () => {
     const [isHovered, setIsHovered] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
+    const [quantity, setQuantity] = useState(1);
+    const [fullscreenImage, setFullscreenImage] = useState(null);
+    const [fullscreenImageIndex, setFullscreenImageIndex] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const dragX = useMotionValue(0);
+    const dragProgress = useTransform(dragX, [-200, 200], [1, -1]);
+    const dragOpacity = useTransform(dragProgress, [-1, 0, 1], [0.5, 1, 0.5]);
+    const dragScale = useTransform(dragProgress, [-1, 0, 1], [0.95, 1, 0.95]);
+    const [animation, setAnimation] = useState({ x: 0 });
+    const [dragStartX, setDragStartX] = useState(0);
+    const imageRef = useRef(null);
+    const [isFullscreenModalOpen, setIsFullscreenModalOpen] = useState(false);
 
     const product = {
         name: "Đầm dạ hội sang trọng",
@@ -71,16 +87,28 @@ const ProductDetailPage = () => {
         setActiveIndex((prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length);
     };
 
+    const handleQuantityChange = (change) => {
+        setQuantity(prevQuantity => Math.max(1, prevQuantity + change));
+    };
+
     const handleAddToCart = () => {
-        if (!selectedSize && !selectedColor) {
-            showNotification("Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng.", "warning");
-        } else if (!selectedSize) {
+        if (!selectedSize) {
             showNotification("Vui lòng chọn kích thước trước khi thêm vào giỏ hàng.", "warning");
-        } else if (!selectedColor) {
-            showNotification("Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng.", "warning");
-        } else {
-            showNotification("Sản phẩm đã được thêm vào giỏ hàng!", "success");
+            return;
         }
+        if (!selectedColor) {
+            showNotification("Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng.", "warning");
+            return;
+        }
+
+        const productToAdd = {
+            ...product,
+            size: selectedSize,
+            color: selectedColor,
+            quantity: quantity
+        };
+        addToCart(productToAdd);
+        showNotification(`Đã thêm ${quantity} ${product.name} vào giỏ hàng!`, "success");
     };
 
     const handleShare = () => {
@@ -108,14 +136,154 @@ const ProductDetailPage = () => {
         // Xử lý sự kiện khi người dùng nhấp vào hình ảnh đánh giá
     };
 
+    const openFullscreenImage = (index) => {
+        setFullscreenImageIndex(index);
+        setFullscreenImage(product.images[index]);
+        setIsFullscreenModalOpen(true);
+    };
+
+    const closeFullscreenImage = () => {
+        setFullscreenImage(null);
+        setFullscreenImageIndex(0);
+        setIsFullscreenModalOpen(false);
+    };
+
+    const nextFullscreenImage = () => {
+        setFullscreenImageIndex((prevIndex) => (prevIndex + 1) % product.images.length);
+    };
+
+    const prevFullscreenImage = () => {
+        setFullscreenImageIndex((prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length);
+    };
+
+    const handleDragStart = (event) => {
+        setIsDragging(true);
+        setDragStartX(event.clientX);
+    };
+
+    const handleDrag = (event) => {
+        if (!isDragging) return;
+        const dragDistance = event.clientX - dragStartX;
+        dragX.set(dragDistance);
+    };
+
+    const handleDragEnd = () => {
+        const draggedDistance = dragX.get();
+        if (Math.abs(draggedDistance) > 100) {
+            if (draggedDistance < 0) {
+                nextFullscreenImage();
+            } else {
+                prevFullscreenImage();
+            }
+        }
+        setIsDragging(false);
+        dragX.set(0);
+    };
+
+    useEffect(() => {
+        if (!isDragging) {
+            setAnimation({ x: 0 });
+        }
+    }, [isDragging]);
+
+    useEffect(() => {
+        setFullscreenImage(product.images[fullscreenImageIndex]);
+    }, [fullscreenImageIndex, product.images]);
+
+    const renderFullscreenImage = useCallback(() => {
+        if (!isFullscreenModalOpen) return null;
+
+        return (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+                onClick={closeFullscreenImage}
+            >
+                <motion.div
+                    className="relative w-full h-full flex items-center justify-center"
+                    onMouseDown={handleDragStart}
+                    onMouseMove={handleDrag}
+                    onMouseUp={handleDragEnd}
+                    onMouseLeave={handleDragEnd}
+                >
+                    <motion.img
+                        key={fullscreenImageIndex}
+                        ref={imageRef}
+                        src={fullscreenImage}
+                        alt="Fullscreen product image"
+                        className="max-w-full max-h-full object-contain"
+                        style={{
+                            x: dragX,
+                            cursor: isDragging ? 'grabbing' : 'grab',
+                        }}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={1}
+                        onClick={(e) => e.stopPropagation()}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    />
+                </motion.div>
+                <button
+                    className="absolute top-4 right-4 text-white text-4xl"
+                    onClick={closeFullscreenImage}
+                >
+                    <MdClose />
+                </button>
+                <button
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-full"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        prevFullscreenImage();
+                    }}
+                >
+                    <FaChevronLeft className="text-black" />
+                </button>
+                <button
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 p-2 rounded-full"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        nextFullscreenImage();
+                    }}
+                >
+                    <FaChevronRight className="text-black" />
+                </button>
+            </motion.div>
+        );
+    }, [isFullscreenModalOpen, fullscreenImage, fullscreenImageIndex, dragX, isDragging, handleDragStart, handleDrag, handleDragEnd, closeFullscreenImage]);
+
     return (
-        <>
+        <div className="pt-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Nút quay lại trang chủ */}
-                <Link to="/" className="inline-flex items-center mb-6 text-indigo-600 hover:text-indigo-800 transition duration-300">
-                    <FaHome className="mr-2" />
-                    <span>Trang chủ</span>
-                </Link>
+                {/* Breadcrumb navigation */}
+                <nav className="flex mb-6" aria-label="Breadcrumb">
+                    <ol className="inline-flex items-center space-x-1 md:space-x-3">
+                        <li className="inline-flex items-center">
+                            <Link to="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">
+                                <FaHome className="mr-2" />
+                                Trang chủ
+                            </Link>
+                        </li>
+                        <li>
+                            <div className="flex items-center">
+                                <FaChevronRightSmall className="text-gray-400 mx-2" />
+                                <Link to="/category/women" className="text-sm font-medium text-gray-700 hover:text-indigo-600">
+                                    Thời trang nữ
+                                </Link>
+                            </div>
+                        </li>
+                        <li aria-current="page">
+                            <div className="flex items-center">
+                                <FaChevronRightSmall className="text-gray-400 mx-2" />
+                                <span className="text-sm font-medium text-gray-500">{product.name}</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
 
                 <div className="flex flex-col lg:flex-row">
                     {/* Thư viện ảnh sản phẩm */}
@@ -126,10 +294,11 @@ const ProductDetailPage = () => {
                                 key={activeIndex}
                                 src={product.images[activeIndex]}
                                 alt={`Sản phẩm ${activeIndex + 1}`}
-                                className="w-full h-[60rem] object-cover"
+                                className="w-full h-[45rem] object-cover cursor-pointer"
                                 initial={{ opacity: 0.7 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
+                                onClick={() => openFullscreenImage(activeIndex)}
                             />
                             <button
                                 onClick={prevImage}
@@ -147,7 +316,7 @@ const ProductDetailPage = () => {
                             </button>
                         </div>
                         {/* Ảnh nhỏ */}
-                        <div className="flex mt-4 space-x-2 overflow-x-auto">
+                        <div className="flex mt-4 space-x-2">
                             {product.images.map((image, index) => {
                                 if (index === activeIndex) return null;
                                 return (
@@ -169,39 +338,6 @@ const ProductDetailPage = () => {
                             })}
                         </div>
                     </div>
-
-                    {isFullscreen && (
-                        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
-                            <div className="relative w-full h-full">
-                                <img
-                                    src={product.images[currentImage]}
-                                    alt={`Sản phẩm ${currentImage + 1}`}
-                                    className="w-full h-full object-contain"
-                                />
-                                <button
-                                    onClick={() => setIsFullscreen(false)}
-                                    className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md"
-                                    aria-label="Đóng xem full màn hình"
-                                >
-                                    <MdClose className="text-gray-800 text-xl" />
-                                </button>
-                                <button
-                                    onClick={() => handleImageChange("prev")}
-                                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md"
-                                    aria-label="Ảnh trước"
-                                >
-                                    <FaChevronLeft className="text-gray-800" />
-                                </button>
-                                <button
-                                    onClick={() => handleImageChange("next")}
-                                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md"
-                                    aria-label="Ảnh tiếp theo"
-                                >
-                                    <FaChevronRight className="text-gray-800" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Chi tiết sản phẩm */}
                     <div className="lg:w-1/2 lg:pl-12">
@@ -238,7 +374,7 @@ const ProductDetailPage = () => {
                                         case 'xanh đậm':
                                             bgColor = 'bg-blue-800';
                                             break;
-                                        case 'đỏ đô':
+                                        case 'ỏ đô':
                                             bgColor = 'bg-red-800';
                                             break;
                                         default:
@@ -257,12 +393,26 @@ const ProductDetailPage = () => {
                         </div>
 
                         {/* Nút Thêm vào giỏ hàng, Yêu thích và Chia sẻ */}
-                        <div className="flex space-x-4 mb-8">
+                        <div className="flex items-center space-x-4 mb-8">
+                            <div className="flex items-center border rounded-xl">
+                                <button
+                                    className="px-2 py-4 border rounded-l-xl hover:bg-gray-300"
+                                    onClick={() => handleQuantityChange(-1)}
+                                >
+                                    <FaMinus />
+                                </button>
+                                <span className="px-7 py-1">{quantity}</span>
+                                <button
+                                    className="px-2 py-4 border rounded-r-xl hover:bg-gray-300"
+                                    onClick={() => handleQuantityChange(1)}
+                                >
+                                    <FaPlus />
+                                </button>
+                            </div>
                             <AddToCartButton
-                                price={product.price}
-                                primaryColor="blue"
-                                secondaryColor="indigo"
-                                onAddToCart={handleAddToCart}
+                                product={{ ...product, size: selectedSize, color: selectedColor, quantity: quantity }}
+                                showNotification={showNotification}
+                                onClick={handleAddToCart}
                             />
                             <button
                                 onClick={handleFavorite}
@@ -415,7 +565,12 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
             </div>
-        </>
+
+            {/* Fullscreen Image Modal */}
+            <AnimatePresence>
+                {renderFullscreenImage()}
+            </AnimatePresence>
+        </div>
     );
 };
 

@@ -13,42 +13,42 @@ const FashionBlog = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto px-4 py-16"
+            className="w-full bg-bg-primary py-16"
         >
-            <h2 className="text-3xl font-bold text-center mb-12">Bài viết thời trang</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {blogPosts.map((post, index) => (
-                    <motion.div
-                        key={post.id}
-                        className="bg-white rounded-lg shadow-md overflow-hidden"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                        whileHover={{ scale: 1.05 }}
-                    >
-                        <motion.img
-                            src={post.image}
-                            alt={post.title}
-                            className="w-full h-48 object-cover"
-                            whileHover={{ scale: 1.1 }}
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <h2 className="text-3xl font-bold text-center mb-12 text-card-headline">Bài viết thời trang</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {blogPosts.map((post, index) => (
+                        <motion.div
+                            key={post.id}
+                            className="bg-illustration-main rounded-lg shadow-md overflow-hidden flex flex-col h-full"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.3 }}
-                        />
-                        <div className="p-4">
-                            <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-                            <p className="text-gray-600 mb-4">{post.excerpt}</p>
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500">{post.date}</span>
-                                <motion.button
-                                    className="text-blue-600 hover:text-blue-800"
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    Xem thêm
-                                </motion.button>
+                            whileHover={{ scale: 1.05 }}
+                        >
+                            <motion.img
+                                src={post.image}
+                                alt={post.title}
+                                className="w-full h-48 object-cover"
+                            />
+                            <div className="p-4 flex flex-col flex-grow">
+                                <h3 className="text-xl font-semibold mb-2 text-card-highlight">{post.title}</h3>
+                                <p className="text-card-paragraph2 mb-4 flex-grow text-clamp-3 text-justify">{post.excerpt}</p>
+                                <div className="flex justify-between items-center mt-auto">
+                                    <span className="text-sm text-card-paragraph2">{post.date}</span>
+                                    <motion.button
+                                        className="text-link hover:text-btn-primary"
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                    >
+                                        Xem thêm
+                                    </motion.button>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
-                ))}
+                        </motion.div>
+                    ))}
+                </div>
             </div>
         </motion.section>
     );

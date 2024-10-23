@@ -1,41 +1,46 @@
 import React, { useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
+import { useCart } from '../../contexts/CartContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
-interface AddToCartButtonProps {
-    price?: number;
-    primaryColor?: string;
-    secondaryColor?: string;
-    onAddToCart?: () => void;
-}
-
-const AddToCartButton: React.FC<AddToCartButtonProps> = ({
-    price = 199000,
-    primaryColor = "indigo",
-    secondaryColor = "purple",
-    onAddToCart
+const AddToCartButton = ({
+    product,
+    primaryColor = "btn-primary",
+    secondaryColor = "btn-text",
+    onClick
 }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const { addToCart } = useCart();
+    const { showNotification } = useNotification();
 
-    const displayPrice = typeof price === 'number' && !isNaN(price)
-        ? price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+    // Kiểm tra xem product có tồn tại và có thuộc tính price không
+    const displayPrice = product && typeof product.price === 'number' && !isNaN(product.price)
+        ? product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
         : '-.--';
 
     const handleAddToCart = () => {
-        console.log("Đã thêm vào giỏ hàng!");
-        if (onAddToCart) {
-            onAddToCart();
+        if (onClick) {
+            onClick();
+        } else if (product) {
+            addToCart(product);
+            showNotification(`Đã thêm ${product.name} vào giỏ hàng!`, "success");
+        } else {
+            showNotification("Không thể thêm sản phẩm vào giỏ hàng.", "error");
         }
     };
 
+    // Nếu không có sản phẩm, không hiển thị nút
+    if (!product) {
+        return null;
+    }
+
     return (
         <motion.button
-            className={`relative overflow-hidden bg-${primaryColor}-500 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 ease-in-out hover:bg-${primaryColor}-600 focus:outline-none focus:ring-2 focus:ring-${primaryColor}-400 focus:ring-opacity-75 shadow-lg hover:shadow-xl`}
+            className={`relative overflow-hidden bg-${primaryColor} text-${secondaryColor} font-semibold py-3 px-6 rounded-full transition-all duration-300 ease-in-out hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-opacity-75 shadow-lg hover:shadow-xl w-full`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleAddToCart}
-            whileHover={{ y: -4 }}
-            whileTap={{ scale: 0.95 }}
         >
             <span className="flex items-center justify-center">
                 <motion.div
@@ -57,7 +62,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
                     animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : '100%' }}
                     transition={{ duration: 0.3 }}
                 >
-                    <span className={`font-bold text-${secondaryColor}-300`}>{displayPrice}</span>
+                    <span className={`font-bold text-${secondaryColor}`}>{displayPrice}</span>
                 </motion.span>
             </span>
             <motion.span
@@ -73,16 +78,12 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     );
 };
 
-function getColorValue(color: string): string {
-    const colorMap: { [key: string]: string } = {
-        indigo: '#4F46E5',
-        purple: '#9333EA',
-        blue: '#3B82F6',
-        green: '#10B981',
-        red: '#EF4444',
-        // Thêm các màu khác nếu cần
+function getColorValue(color) {
+    const colorMap = {
+        'btn-primary': '#f9bc60',
+        'btn-text': '#001e1d',
     };
-    return colorMap[color] || colorMap.indigo;
+    return colorMap[color] || colorMap['btn-primary'];
 }
 
 export default AddToCartButton;

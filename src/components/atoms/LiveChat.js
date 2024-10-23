@@ -14,7 +14,7 @@ const LiveChat = () => {
                 onClick={toggleChat}
                 className="bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
             >
-                <IoMdChatbubbles className="text-2xl" />
+                <IoMdChatbubbles className="text-lg" />
             </button>
             {isChatOpen && (
                 <div className="absolute bottom-16 right-0 w-80 bg-white rounded-lg shadow-xl">

@@ -4,9 +4,9 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Search } from "lucide-react";
 import useCart from '../../hooks/useCart';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, color } from "framer-motion";
 
-const Header = () => {
+const Header = ({ isTransparent }) => {
     const [isSticky, setIsSticky] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +16,8 @@ const Header = () => {
     const timeoutRef = useRef(null);
     const [isFocused, setIsFocused] = useState(false);
     const [hoveredCategory, setHoveredCategory] = useState(null);
+    const [isCartHovered, setIsCartHovered] = useState(false);
+    const [scrollPosition, setScrollPosition] = useState(0);
 
     const categories = [
         { name: "Trang chủ", link: "/" },
@@ -27,7 +29,9 @@ const Header = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsSticky(window.scrollY > 0);
+            const position = window.pageYOffset;
+            setScrollPosition(position);
+            setIsSticky(position > 0);
         };
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
@@ -55,28 +59,25 @@ const Header = () => {
         }, 300);
     };
 
+    // Xác định màu nền dựa trên prop isTransparent và cuộn
+    const headerBackground = isTransparent
+        ? scrollPosition > 0
+            ? "bg-bg-primary shadow-md"
+            : "bg-transparent"
+        : "bg-bg-primary shadow-md";
+
+    // Xác định màu chữ dựa trên prop isTransparent và cuộn
+    const textColor = isTransparent && scrollPosition === 0 ? "text-text-headline" : "text-text-headline";
+
     return (
         <motion.header
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.5 }}
-            className={`w-full bg-white transition-all duration-300 ${isSticky ? "fixed top-0 left-0 shadow-md" : "relative"} z-50 border-b-2 border-blue-200`}
+            className={`w-full transition-all duration-300 fixed top-0 left-0 z-50 ${headerBackground}`}
         >
-            <div className="container mx-auto px-4 py-4">
-                <div className="flex items-center justify-between">
-                    {/* Logo */}
-                    <motion.div
-                        className="flex-shrink-0"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                    >
-                        <img
-                            src="/images/logo.gif"
-                            alt="Fashion Logo"
-                            className="h-10 w-auto"
-                        />
-                    </motion.div>
-
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between py-4">
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex space-x-6">
                         {categories.map((category, index) => (
@@ -98,13 +99,14 @@ const Header = () => {
                                 {category.link ? (
                                     <motion.a
                                         href={category.link}
-                                        className={`flex items-center text-gray-700 hover:text-theme-color-primary focus:outline-none relative ${hoveredCategory === index ? 'text-blue-500' : ''}`}
+                                        className={`flex items-center ${textColor} hover:text-btn-primary focus:outline-none relative ${hoveredCategory === index ? 'text-btn-primary' : ''
+                                            }`}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                     >
                                         {category.name}
                                         <motion.div
-                                            className="absolute -bottom-0.5 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"
+                                            className="absolute -bottom-0.5 left-0 h-0.5 bg-btn-primary rounded-full"
                                             initial={{ width: 0 }}
                                             animate={{ width: hoveredCategory === index ? '100%' : 0 }}
                                             transition={{ duration: 0.3 }}
@@ -112,7 +114,8 @@ const Header = () => {
                                     </motion.a>
                                 ) : (
                                     <motion.button
-                                        className={`flex items-center text-gray-700 hover:text-theme-color-primary focus:outline-none relative ${hoveredCategory === index ? 'text-blue-500' : ''}`}
+                                        className={`flex items-center ${textColor} hover:text-btn-primary focus:outline-none relative ${hoveredCategory === index ? 'text-btn-primary' : ''
+                                            }`}
                                         aria-haspopup="true"
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
@@ -125,7 +128,7 @@ const Header = () => {
                                             <IoMdArrowDropdown className="ml-1" />
                                         </motion.div>
                                         <motion.div
-                                            className="absolute -bottom-0.5 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"
+                                            className="absolute -bottom-0.5 left-0 h-0.5 bg-gradient-to-r from-btn-primary to-illustration-highlight rounded-full"
                                             initial={{ width: 0 }}
                                             animate={{ width: hoveredCategory === index ? '100%' : 0 }}
                                             transition={{ duration: 0.3 }}
@@ -141,16 +144,16 @@ const Header = () => {
                                             transition={{ duration: 0.2 }}
                                             className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
                                         >
-                                            <div className="py-1" role="menu" aria-orientation="vertical">
+                                            <div className="border-b border-illustration-stroke" role="menu" aria-orientation="vertical">
                                                 {category.subcategories.map((subcategory, subIndex) => (
                                                     <motion.a
                                                         key={subIndex}
                                                         href="#"
-                                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                        className="block px-4 py-2 text-sm text-card-paragraph2 hover:bg-gray-100 hover: rounded-md"
                                                         role="menuitem"
-                                                        whileHover={{ backgroundColor: "#f3f4f6", x: 5 }}
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
+                                                        whileHover={{ backgroundColor: "#f9bc60" }}
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
                                                         transition={{ duration: 0.2, delay: subIndex * 0.05 }}
                                                     >
                                                         {subcategory}
@@ -164,15 +167,29 @@ const Header = () => {
                         ))}
                     </nav>
 
+                    {/* Logo */}
+                    <motion.div
+                        className="flex-shrink-0"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <img
+                            src={isTransparent && scrollPosition === 0 ? "/images/text-logo-white.png" : "/images/text-logo-white.png"}
+                            onClick={() => window.location.href = '/'}
+                            alt="Logo thời trang"
+                            className="h-16 w-auto cursor-pointer"
+                        />
+                    </motion.div>
+
                     {/* Search Bar */}
-                    <div className="hidden md:block relative w-full max-w-sm">
+                    <div className="hidden md:block relative w-xs max-w-xs">
                         <div
                             className={`relative flex items-center transition-all duration-300 ease-in-out`}
                         >
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sản phẩm..."
-                                className="w-full h-11 py-3 pl-12 pr-20 text-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-transparent rounded-full outline-none transition-all duration-300 ease-in-out focus:border-blue-400 focus:from-white focus:to-white"
+                                className="w-full h-10 py-3 pl-12 pr-20 text-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-transparent rounded-full outline-none transition-all duration-300 ease-in-out focus:border-illustration-highlight focus:from-white focus:to-white"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onFocus={() => setIsFocused(true)}
@@ -181,20 +198,20 @@ const Header = () => {
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <Search
                                     className={`h-6 w-6 transition-all duration-300 ease-in-out ${isFocused
-                                        ? "text-blue-500 scale-110 rotate-12"
+                                        ? "text-illustration-highlight scale-110 rotate-12"
                                         : "text-gray-400"
                                         }`}
                                 />
                             </div>
-                            <button
-                                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-blue-400 to-indigo-500 text-white px-2 py-2 rounded-full transition-all duration-300 ease-in-out hover:from-blue-500 hover:to-indigo-600 hover:shadow-lg active:scale-95"
+                            <motion.button
+                                className="absolute right-0 bg-gradient-to-r from-btn-primary to-illustration-highlight text-btn-text px-2 py-2 rounded-full transition-all duration-300 ease-in-out"
+                                whileHover={{
+                                    backgroundImage: 'linear-gradient(to right, #f9bc60, #e16162)',
+                                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                                }}
                             >
                                 Tìm kiếm
-                            </button>
-                            <div
-                                className={`absolute -bottom-0.5 left-1/2 transform -translate-x-1/2 h-0.5 bg-gradient-to-r from-blue-400 to-indigo-500 transition-all duration-300 ease-in-out rounded-full ${isFocused ? "w-full" : "w-0"
-                                    }`}
-                            ></div>
+                            </motion.button>
                         </div>
                         {searchSuggestions.length > 0 && (
                             <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg">
@@ -213,35 +230,90 @@ const Header = () => {
                     {/* User Account and Cart */}
                     <div className="flex items-center space-x-4">
                         <motion.button
-                            className="text-gray-700 hover:text-theme-color-primary focus:outline-none"
+                            className={`${textColor} hover:text-btn-primary focus:outline-none`}
                             aria-label="Tài khoản người dùng"
-                            whileHover={{ scale: 1.1, color: '#3B82F6' }}
+                            whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                         >
                             <FaUser className="text-xl" />
                         </motion.button>
-                        <motion.button
-                            className="relative text-gray-700 hover:text-theme-color-primary focus:outline-none"
-                            aria-label="Giỏ hàng"
-                            whileHover={{ scale: 1.1, color: '#3B82F6' }}
-                            whileTap={{ scale: 0.9 }}
+                        <motion.div
+                            className="relative"
+                            onMouseEnter={() => setIsCartHovered(true)}
+                            onMouseLeave={() => setIsCartHovered(false)}
                         >
-                            <FaShoppingCart className="text-xl" />
-                            {cartItems > 0 && (
-                                <motion.span
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="absolute -top-2 -right-2 bg-theme-color-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-blue-600"
-                                >
-                                    {cartItems}
-                                </motion.span>
-                            )}
-                        </motion.button>
+                            <motion.button
+                                className={`relative ${textColor} hover:text-btn-primary focus:outline-none`}
+                                aria-label="Giỏ hàng"
+                                whileHover={{ scale: 1.1, color: '#f9bc60' }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <FaShoppingCart className="text-xl mt-2" />
+                                {cartItems.length > 0 && (
+                                    <motion.span
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="absolute -top-2 -right-2 bg-illustration-highlight text-btn-text rounded-full w-5 h-5 flex items-center justify-center text-xs  hover:text-btn-primary"
+                                    >
+                                        {cartItems.length}
+                                    </motion.span>
+                                )}
+                            </motion.button>
+
+                            <AnimatePresence>
+                                {isCartHovered && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 10 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl z-50"
+                                    >
+                                        <div className="p-4">
+                                            <h3 className="text-lg font-semibold mb-2">Giỏ hàng của bạn</h3>
+                                            {!cartItems || (Array.isArray(cartItems) && cartItems.length === 0) ? (
+                                                <p className="text-gray-500">Giỏ hàng trống</p>
+                                            ) : (
+                                                <>
+                                                    <ul className="space-y-2">
+                                                        {Array.isArray(cartItems) ? (
+                                                            cartItems.slice(0, 3).map((item, index) => (
+                                                                <li key={index} className="flex items-center justify-between">
+                                                                    <span className="text-sm">{item.name}</span>
+                                                                    <span className="text-sm font-semibold">{item.price}</span>
+                                                                </li>
+                                                            ))
+                                                        ) : (
+                                                            <li className="flex items-center justify-between">
+                                                                <span className="text-sm">{cartItems.name}</span>
+                                                                <span className="text-sm font-semibold">{cartItems.price}</span>
+                                                            </li>
+                                                        )}
+                                                    </ul>
+                                                    {Array.isArray(cartItems) && cartItems.length > 3 && (
+                                                        <p className="text-sm text-gray-500 mt-2">
+                                                            ...và {cartItems.length - 3} sản phẩm khác
+                                                        </p>
+                                                    )}
+                                                    <motion.button
+                                                        whileHover={{ scale: 1.05 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                        className="mt-4 w-full bg-btn-primary text-btn-text py-2 rounded-md hover:bg-illustration-highlight transition duration-300"
+                                                    >
+                                                        Xem giỏ hàng
+                                                    </motion.button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
                     </div>
 
                     {/* Mobile Menu Button */}
                     <motion.button
-                        className="md:hidden text-gray-700 hover:text-theme-color-primary focus:outline-none"
+                        className={`md:hidden ${textColor} hover:text-btn-primary focus:outline-none`}
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         aria-label="Mở/đóng menu di động"
                         whileHover={{ scale: 1.1 }}

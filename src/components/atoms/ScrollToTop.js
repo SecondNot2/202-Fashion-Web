@@ -43,7 +43,7 @@ const ScrollToTop = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                 >
-                    <FaArrowUp className="text-2xl" />
+                    <FaArrowUp className="text-lg" />
                 </motion.button>
             )}
         </AnimatePresence>

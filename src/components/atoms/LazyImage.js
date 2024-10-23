@@ -1,18 +1,24 @@
-import React from 'react';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import { useState, useEffect } from 'react';
 
-const LazyImage = ({ src, alt, className, wrapperClassName, ...props }) => {
+function LazyImage({ src, alt, className }) {
+    const [imageSrc, setImageSrc] = useState('placeholder.jpg');
+
+    useEffect(() => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            setImageSrc(src);
+        };
+    }, [src]);
+
     return (
-        <LazyLoadImage
-            src={src}
+        <img
+            src={imageSrc}
             alt={alt}
-            effect="blur"
-            className={className}
-            wrapperClassName={wrapperClassName}
-            {...props}
+            className={`transition-opacity duration-300 ${className}`}
+            loading="lazy"
         />
     );
-};
+}
 
 export default LazyImage;
