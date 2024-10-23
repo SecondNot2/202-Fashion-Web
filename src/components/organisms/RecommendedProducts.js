@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../molecules/ProductCard';
 
 const RecommendedProducts = ({ showNotification }) => {
     const [recommendedProducts, setRecommendedProducts] = useState([]);
 
-    const allProducts = [
+    const allProducts = useMemo(() => [
         { id: 1, name: "Áo thun phong cách", price: 199000, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab", category: "thời trang nam", label: "New" },
         { id: 2, name: "Đầm dạ hội", price: 899000, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956", category: "thời trang nữ", label: "Best-Seller" },
         { id: 3, name: "Giày thể thao trẻ em", price: 499000, image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86", category: "thời trang trẻ em", label: "Sale" },
         { id: 4, name: "Túi xách da", price: 1299000, image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3", category: "thời trang nữ", label: "New" }
-    ];
+    ], []);
 
     useEffect(() => {
         const getRecommendedProducts = () => {
@@ -19,7 +19,7 @@ const RecommendedProducts = ({ showNotification }) => {
         };
 
         setRecommendedProducts(getRecommendedProducts());
-    }, []);
+    }, [allProducts]);
 
     return (
         <motion.section
