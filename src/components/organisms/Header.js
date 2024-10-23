@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FaUser, FaShoppingCart } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -18,6 +18,7 @@ const Header = ({ isTransparent }) => {
     const [hoveredCategory, setHoveredCategory] = useState(null);
     const [isCartHovered, setIsCartHovered] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
+    const [allProducts, setAllProducts] = useState([]);
 
     const categories = [
         { name: "Trang chủ", link: "/" },
@@ -26,6 +27,17 @@ const Header = ({ isTransparent }) => {
         { name: "Phụ kiện", subcategories: ["Túi xách", "Mũ", "Kính mát"] },
         { name: "Giảm giá", subcategories: ["Mùa hè", "Clearance", "Flash Sale"] }
     ];
+
+    const sampleProducts = useMemo(() => [
+        { id: 1, name: "Áo sơ mi", category: "Áo" },
+        { id: 2, name: "Quần jean", category: "Quần" },
+        { id: 3, name: "Váy hoa", category: "Váy" },
+        { id: 4, name: "Giày thể thao", category: "Giày" },
+    ], []);
+
+    useEffect(() => {
+        setAllProducts(sampleProducts);
+    }, [sampleProducts]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -39,14 +51,18 @@ const Header = ({ isTransparent }) => {
 
     useEffect(() => {
         if (searchQuery.length > 2) {
-            const suggestions = ["Dress", "Jeans", "T-shirt", "Jacket"].filter(item =>
-                item.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            const suggestions = allProducts
+                .filter(product =>
+                    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.category.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map(product => product.name)
+                .slice(0, 5); // Giới hạn số lượng gợi ý
             setSearchSuggestions(suggestions);
         } else {
             setSearchSuggestions([]);
         }
-    }, [searchQuery]);
+    }, [searchQuery, allProducts]);
 
     const handleCategoryHover = (index) => {
         clearTimeout(timeoutRef.current);

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 const Banner = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
 
-    const slides = [
+    const slides = useMemo(() => [
         {
             image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
             title: 'Bộ sưu tập mùa hè 2024',
@@ -24,7 +24,7 @@ const Banner = () => {
             description: 'Hoàn thiện phong cách của bạn với bộ sưu tập phụ kiện mới',
             buttonText: 'Xem thêm'
         }
-    ];
+    ], []);
 
     useEffect(() => {
         setIsVisible(true);
@@ -33,7 +33,7 @@ const Banner = () => {
         }, 5000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [slides.length]);
 
     const currentSlideData = slides[currentSlide];
 
