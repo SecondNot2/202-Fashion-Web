@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../molecules/ProductCard';
 
 const SaleProducts = ({ showNotification }) => {
     const [timeLeft, setTimeLeft] = useState({});
 
-    const saleProducts = [
+    const saleProducts = useMemo(() => [
         { id: 5, name: "Váy mùa hè", price: 799000, salePrice: 599000, image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446", category: "Thời trang nữ", discount: 25, endTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) },
         { id: 6, name: "Áo khoác nam", price: 1499000, salePrice: 999000, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5", category: "Thời trang nam", discount: 33, endTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) },
         { id: 7, name: "Balo trẻ em", price: 399000, salePrice: 299000, image: "https://down-vn.img.susercontent.com/file/1613d45880daba79aa84d7511c5ba2c1", category: "Thời trang trẻ em", discount: 25, endTime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) },
-    ];
+    ], []); // Mảng dependencies rỗng vì dữ liệu không thay đổi
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -31,7 +31,7 @@ const SaleProducts = ({ showNotification }) => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [saleProducts]);
 
     return (
         <motion.section
