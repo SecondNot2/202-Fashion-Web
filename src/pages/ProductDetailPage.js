@@ -130,32 +130,32 @@ const ProductDetailPage = () => {
         setIsFullscreenModalOpen(true);
     };
 
-    const closeFullscreenImage = () => {
+    const closeFullscreenImage = useCallback(() => {
         setFullscreenImage(null);
         setFullscreenImageIndex(0);
         setIsFullscreenModalOpen(false);
-    };
+    }, []);
 
-    const nextFullscreenImage = () => {
+    const nextFullscreenImage = useCallback(() => {
         setFullscreenImageIndex((prevIndex) => (prevIndex + 1) % product.images.length);
-    };
+    }, [product.images.length]);
 
-    const prevFullscreenImage = () => {
+    const prevFullscreenImage = useCallback(() => {
         setFullscreenImageIndex((prevIndex) => (prevIndex - 1 + product.images.length) % product.images.length);
-    };
+    }, [product.images.length]);
 
-    const handleDragStart = (event) => {
+    const handleDragStart = useCallback((event) => {
         setIsDragging(true);
         setDragStartX(event.clientX);
-    };
+    }, []);
 
-    const handleDrag = (event) => {
+    const handleDrag = useCallback((event) => {
         if (!isDragging) return;
         const dragDistance = event.clientX - dragStartX;
         dragX.set(dragDistance);
-    };
+    }, [isDragging, dragStartX, dragX]);
 
-    const handleDragEnd = () => {
+    const handleDragEnd = useCallback(() => {
         const draggedDistance = dragX.get();
         if (Math.abs(draggedDistance) > 100) {
             if (draggedDistance < 0) {
@@ -166,7 +166,7 @@ const ProductDetailPage = () => {
         }
         setIsDragging(false);
         dragX.set(0);
-    };
+    }, [dragX, nextFullscreenImage, prevFullscreenImage]);
 
     useEffect(() => {
         if (!isDragging) {
@@ -242,7 +242,20 @@ const ProductDetailPage = () => {
                 </button>
             </motion.div>
         );
-    }, [isFullscreenModalOpen, fullscreenImage, fullscreenImageIndex, dragX, isDragging, handleDragStart, handleDrag, handleDragEnd, closeFullscreenImage]);
+    }, [
+        isFullscreenModalOpen,
+        fullscreenImage,
+        fullscreenImageIndex,
+        dragX,
+        isDragging,
+        handleDragStart,
+        handleDrag,
+        handleDragEnd,
+        closeFullscreenImage,
+        nextFullscreenImage,
+        prevFullscreenImage,
+        product.name
+    ]);
 
     return (
         <div className="pt-20">
