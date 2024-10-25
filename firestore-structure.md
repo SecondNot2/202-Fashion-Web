@@ -3,6 +3,7 @@
 ## 1. Cấu Trúc Dữ Liệu
 
 ### 1.1. Users
+
 - Mục đích: Quản lý thông tin người dùng
 - Cấu trúc:
   ```json
@@ -24,6 +25,7 @@
   ```
 
 ### 1.2. Products
+
 - Mục đích: Quản lý thông tin sản phẩm
 - Cấu trúc:
   ```json
@@ -42,6 +44,7 @@
   ```
 
 ### 1.3. Categories
+
 - Mục đích: Phân loại sản phẩm
 - Cấu trúc:
   ```json
@@ -55,6 +58,7 @@
   ```
 
 ### 1.4. Orders
+
 - Mục đích: Quản lý đơn đặt hàng
 - Cấu trúc:
   ```json
@@ -82,6 +86,7 @@
   ```
 
 ### 1.5. Cart
+
 - Mục đích: Lưu trữ giỏ hàng tạm thời
 - Cấu trúc:
   ```json
@@ -99,6 +104,7 @@
   ```
 
 ### 1.6. Reviews
+
 - Mục đích: Lưu trữ đánh giá sản phẩm
 - Cấu trúc:
   ```json

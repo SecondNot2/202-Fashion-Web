@@ -52,17 +52,17 @@ const Footer = React.memo(() => {
                     <div className="">
                         <h3 className="text-lg font-semibold mb-4">Về chúng tôi</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="hover:text-btn-primary">Giới thiệu</a></li>
-                            <li><a href="#" className="hover:text-btn-primary">Tuyển dụng</a></li>
-                            <li><a href="#" className="hover:text-btn-primary">Liên hệ</a></li>
+                            <li><a href="/" className="hover:text-btn-primary">Giới thiệu</a></li>
+                            <li><a href="/" className="hover:text-btn-primary">Tuyển dụng</a></li>
+                            <li><a href="/" className="hover:text-btn-primary">Liên hệ</a></li>
                         </ul>
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Hỗ trợ khách hàng</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="hover:text-btn-primary">Hướng dẫn đặt hàng</a></li>
-                            <li><a href="#" className="hover:text-btn-primary">Chính sách đổi trả</a></li>
-                            <li><a href="#" className="hover:text-btn-primary">Câu hỏi thường gặp</a></li>
+                            <li><a href="/" className="hover:text-btn-primary">Hướng dẫn đặt hàng</a></li>
+                            <li><a href="/" className="hover:text-btn-primary">Chính sách đổi trả</a></li>
+                            <li><a href="/" className="hover:text-btn-primary">Câu hỏi thường gặp</a></li>
                         </ul>
                     </div>
                     <div>
@@ -74,10 +74,10 @@ const Footer = React.memo(() => {
                             <a href="https://www.facebook.com/second.not2/" className="text-text-paragraph hover:text-btn-primary transition duration-300">
                                 <FaFacebookF className="text-xl" />
                             </a>
-                            <a href="#" className="text-text-paragraph hover:text-btn-primary transition duration-300">
+                            <a href="/" className="text-text-paragraph hover:text-btn-primary transition duration-300">
                                 <FaTwitter className="text-xl" />
                             </a>
-                            <a href="#" className="text-text-paragraph hover:text-btn-primary transition duration-300">
+                            <a href="/" className="text-text-paragraph hover:text-btn-primary transition duration-300">
                                 <FaInstagram className="text-xl" />
                             </a>
                         </div>
